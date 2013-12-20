@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Chat</title>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    
+	<script type="text/javascript">
+	var _nAjaxTimeout = 5 * 10000;
+	var main = function(){
+		$.ajax({
+			type: "GET",
+			url:"/stepEventHub/",
+			dataType: "json",
+			cache: false,
+			timeout: _nAjaxTimeout,
+			success: function(data, textStatus, jqXHR) {
+				// alert(eval(data["result_code"])+data["msg"]);
+				// alert(textStatus);
+				// alert(eval(jqXHR));
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert(textStatus);
+			}
+		});
+	};
+
+	$(document).ready(main);
+
+	var requestQRCode = function(){
+		$.ajax({
+			type: "GET",
+			url:"/renderQRCode/",
+			dataType: "text",
+			cache: false,
+			timeout: _nAjaxTimeout,
+			success: function(data, textStatus, jqXHR) {
+				
+				// $("#qrcode").css("visibility","hidden");
+				$("#qrcode").attr('src',data);
+				$("#qrcode").delay(200).fadeIn();
+
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert(textStatus);
+			}
+		});
+
+	};
+	$(document).ready(requestQRCode);
+
+	</script>
+
+
+  </head>
+  <body>
+  	<img src="" id="qrcode" width="220" height="220"/>
+  
+    11111111
+  </body>
+</html>
