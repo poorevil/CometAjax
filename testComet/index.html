@@ -8,11 +8,21 @@
     
 	<script type="text/javascript">
 	var uuid = "{{uuid}}";
+	var requestCount = 0;
 
+	function resetQRCode(){
+		location.reload();
+	}
 
 	var _nAjaxTimeout = 5 * 10000;
 	//获取登录结果，长连接
 	var watchDog = function(){
+		if (requestCount == 30) {
+			resetQRCode();
+		}
+
+		requestCount++;
+
 		$.ajax({
 			type: "GET",
 			url:"/loginresult/"+uuid+"/",
@@ -41,10 +51,10 @@
 		});
 	};
 
-	$(document).ready(watchDog);
-
 	//获取二维码
 	var requestQRCode = function(){
+		watchDog();
+
 		$.ajax({
 			type: "GET",
 			url:"/renderQRCode/"+uuid+"/",
