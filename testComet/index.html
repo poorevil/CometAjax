@@ -7,11 +7,15 @@
 	<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     
 	<script type="text/javascript">
+	var uuid = "{{uuid}}";
+
+
 	var _nAjaxTimeout = 5 * 10000;
-	var main = function(){
+	//获取登录结果，长连接
+	var watchDog = function(){
 		$.ajax({
 			type: "GET",
-			url:"/stepEventHub/",
+			url:"/loginresult/"+uuid+"/",
 			dataType: "json",
 			cache: false,
 			timeout: _nAjaxTimeout,
@@ -19,19 +23,31 @@
 				// alert(eval(data["result_code"])+data["msg"]);
 				// alert(textStatus);
 				// alert(eval(jqXHR));
+
+				switch(data["result_code"]){
+					case 208://get result！！
+						alert("result_code: "+eval(data["result_code"])+"     msg: "+data["msg"]);
+						break;
+					case 408://time out
+					default:
+						setTimeout(watchDog(),500);
+						break;
+				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				alert(textStatus);
+				// alert(textStatus);
+				setTimeout(watchDog(),500);
 			}
 		});
 	};
 
-	$(document).ready(main);
+	$(document).ready(watchDog);
 
+	//获取二维码
 	var requestQRCode = function(){
 		$.ajax({
 			type: "GET",
-			url:"/renderQRCode/",
+			url:"/renderQRCode/"+uuid+"/",
 			dataType: "text",
 			cache: false,
 			timeout: _nAjaxTimeout,
@@ -56,7 +72,5 @@
   </head>
   <body>
   	<img src="" id="qrcode" width="220" height="220"/>
-  
-    11111111
   </body>
 </html>

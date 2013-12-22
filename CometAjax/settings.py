@@ -1,4 +1,6 @@
 # Django settings for CometAjax project.
+import os
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),"..")) 
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -21,6 +23,17 @@ DATABASES = {
     }
 }
 
+#memcache
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': [
+            '127.0.0.1:11211',
+#            '172.19.26.242:11212',
+#            '172.19.26.244:11213',
+        ]
+    }
+}
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
@@ -95,7 +108,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+#    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
@@ -111,7 +124,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/Users/hanchao/Documents/workspace/CometAjax"
+    PROJECT_PATH
 )
 
 INSTALLED_APPS = (

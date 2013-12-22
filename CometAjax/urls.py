@@ -20,8 +20,10 @@ urlpatterns = patterns('',
     # url(r'^admin/', include(admin.site.urls)),
 
     (r'^index/$', 'testComet.views.index'),
-    (r'^stepEventHub/$', 'testComet.views.stepEventHub'),
-    (r'^renderQRCode/$', 'testComet.views.renderQRCode'),
+    (r'^loginresult/(?P<uuid>[\w\d]{0,50})/$', 'testComet.views.loginResult'),
+    (r'^renderQRCode/(?P<uuid>[\w\d]{0,50})/$', 'testComet.views.renderQRCode'),
+    (r'^clientLogin$', 'testComet.views.clientLogin'),
+    
     
     
     (r'^(?P<path>.*)$', 'django.views.static.serve'
