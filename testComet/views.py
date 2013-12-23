@@ -18,15 +18,11 @@ def index(request):
     m.update("%f"%time.time())
     uuid = m.hexdigest()
     
-    print time.time()
-    
     return render_to_response('testComet/index.html', {'uuid': uuid}) 
 
 def loginResult(request,uuid):
     for i in range(0,10):
-        
         loginResult = cache.get(uuid,'null')
-        print loginResult
         if cmp(loginResult,'null') != 0:
             ''' 
             登录成功
