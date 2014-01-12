@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>微令牌</title>
+	<!-- 最新 Bootstrap 核心 CSS 文件 -->
+	<link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
+	<style type="text/css" media="screen">
+		body {
+	        background-color: #f1f1f1;
+	        margin: 0;
+	        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	      }
+
+	      .container { 
+	      	margin: 50px auto 20px auto; 
+	      	/*width: 640px; */
+	      	text-align: center; 
+	      }
+
+	      .logo { display: inline-block; margin-top: 15px; }
+	      
+		  .title_header {
+
+	      	padding: 10px 10px 10px 10px; 
+	      }
+
+	      .lead{
+	      	color: #666666;
+	        font-weight: 200;
+	        font-size: 14px;
+	        margin: 20px 10px;
+	      }
+
+	      .footer {
+	      		margin-top: 29px;
+			  padding-top: 19px;
+			  color: #777;
+			  border-top: 1px solid #e5e5e5;
+			}
+	</style>
+  </head>
+  <body>
+  	<!-- <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="header">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">微令牌</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </div> -->
+
+    <div class="container">
+    	<div class="title_header">
+	        <h1>微令牌 <small>完善账号信息</small></h1>
+        </div>
+		
+		 <p class="lead">请使用<a href="#">微令牌客户端</a>扫描下方二维码进行登录。</p>
+
+		 <div class="footer">
+	        <p>&copy; Company 2013</p>
+	      </div>
+    </div><!-- /.container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+	<script src="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+	// var uuid = "{{uuid}}";
+	// var requestCount = 0;
+
+	// function resetQRCode(){
+	// 	location.reload();
+	// }
+
+	// var _nAjaxTimeout = 5 * 10000;
+	// //获取登录结果，长连接
+	// var watchDog = function(){
+	// 	if (requestCount == 30) {
+	// 		resetQRCode();
+	// 	}
+
+	// 	requestCount++;
+
+	// 	$.ajax({
+	// 		type: "GET",
+	// 		url:"/regist/registResult/"+uuid+"/",
+	// 		dataType: "json",
+	// 		cache: false,
+	// 		timeout: _nAjaxTimeout,
+	// 		success: function(data, textStatus, jqXHR) {
+	// 			// alert(eval(data["result_code"])+data["msg"]);
+	// 			// alert(textStatus);
+	// 			// alert(eval(jqXHR));
+
+	// 			switch(data["result_code"]){
+	// 				case 208://get result！！
+	// 					alert("result_code: "+eval(data["result_code"])+"     msg: "+data["msg"]);
+
+	// 					location.href = "/regist/bindAccount/"+uuid+"/";
+
+	// 					break;
+	// 				case 408://time out
+	// 				default:
+	// 					setTimeout(watchDog(),500);
+	// 					break;
+	// 			}
+	// 		},
+	// 		error: function(jqXHR, textStatus, errorThrown) {
+	// 			// alert(textStatus);
+	// 			setTimeout(watchDog(),500);
+	// 		}
+	// 	});
+	// };
+
+	// //获取二维码
+	// var requestQRCode = function(){
+	// 	watchDog();
+
+	// 	$.ajax({
+	// 		type: "GET",
+	// 		url:"/regist/renderQRCode/"+uuid+"/",
+	// 		dataType: "text",
+	// 		cache: false,
+	// 		timeout: _nAjaxTimeout,
+	// 		success: function(data, textStatus, jqXHR) {
+				
+	// 			// $("#qrcode").css("visibility","hidden");
+	// 			$("#qrcode").attr('src',data);
+	// 			$("#qrcode").delay(200).fadeIn();
+
+	// 		},
+	// 		error: function(jqXHR, textStatus, errorThrown) {
+	// 			alert(textStatus);
+	// 		}
+	// 	});
+
+	// };
+	// $(document).ready(requestQRCode);
+
+	</script>
+  </body>
+</html>

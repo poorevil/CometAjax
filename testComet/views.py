@@ -8,6 +8,8 @@ import qrcode
 import cStringIO
 import time
 import hashlib
+import json
+
 
 from django.core.cache import cache
 
@@ -66,6 +68,6 @@ def clientLogin(request):
         
     return HttpResponse('''{"login_result":400,"msg":"login failed"}''')
     
-    
+
     
     

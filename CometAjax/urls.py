@@ -1,3 +1,4 @@
+#-*- coding:UTF-8 -*-
 from django.conf.urls import patterns, include, url
 import os
 
@@ -24,6 +25,15 @@ urlpatterns = patterns('',
     (r'^renderQRCode/(?P<uuid>[\w\d]{0,50})/$', 'testComet.views.renderQRCode'),
     (r'^clientLogin$', 'testComet.views.clientLogin'),
     
+#    接口部分 
+    (r'^sliderList$', 'interface.views.sliderList'),
+    
+#    注册部分
+    (r'^regist/scanqrcode/$', 'AuthCenter.views.scanQRCode'),
+    (r'^regist/registResult/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.registResult'),
+    (r'^regist/renderQRCode/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.renderQRCode'),
+    (r'^regist/clientRegist$', 'AuthCenter.views.clientRegist'),
+    (r'^regist/bindAccount/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.bindAccount'),
     
     
     (r'^(?P<path>.*)$', 'django.views.static.serve'
