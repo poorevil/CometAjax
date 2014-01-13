@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 import os
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -19,7 +20,7 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
 
-    (r'^index/$', 'testComet.views.index'),
+    (r'^$', 'testComet.views.index'),
     (r'^loginresult/(?P<uuid>[\w\d]{0,50})/$', 'testComet.views.loginResult'),
     (r'^renderQRCode/(?P<uuid>[\w\d]{0,50})/$', 'testComet.views.renderQRCode'),
     (r'^clientLogin$', 'testComet.views.clientLogin'),
@@ -27,5 +28,7 @@ urlpatterns = patterns('',
     
     
     (r'^(?P<path>.*)$', 'django.views.static.serve'
-     ,{'document_root': PROJECT_PATH+'/testapp/static', 'show_indexes': False}),
+     ,{'document_root': PROJECT_PATH+'/testComet/static', 'show_indexes': False}),
 )
+
+urlpatterns += staticfiles_urlpatterns() 
