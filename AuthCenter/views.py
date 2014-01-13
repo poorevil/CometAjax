@@ -66,20 +66,55 @@ def clientRegist(request):
 def bindAccount(request,uuid):
     ''' 
     账号绑定页
-    TODO:
+    TODO: 
         显示对应的portal logo
         根据后台配置，显示对应的账号绑定表格
     '''
+    if len(uuid) > 0 :
+        registDict = cache.get(uuid,None)
+        if registDict is not None:
+            portalId = registDict['portalId']
+            print portalId
+            '''
+            通过portalId从后台中取到对应的绑定所需提交的key-value
+            组装form表单内容，写入页面
+            '''
     
     
     
     
-    
-    return render_to_response('AuthCenter/templates/regist_bind_account.html') 
-    
+    return render_to_response('AuthCenter/templates/regist_bind_account.html', {'uuid': uuid}) 
     
     
+def bindAccountFormAjaxPost(request):
+    '''
+    账号绑定页通过Ajax post提交的表单数据
+    TODO:
+        1.校验uuid是否合法
+        1.1.根据uuid从memcached中取到portalId
+        2.提交用户名、密码等(根据后台配置，提交对应的账号绑定key-value)到后台认证服务器进行校验
+        3.保存uuid、后台认证服务器返回的token串、当前时间等
+        4.修改memcached中uuid对应的值
+        5.返回绑定结果
+    '''
+    if request.method == 'POST' :
+        uuid = request.POST.get('uuid','')
+        if len(uuid) > 0 :
+            registDict = cache.get(uuid,None)
+            if registDict is not None:
+                portalId = registDict['portalId']
+                print portalId
+                ''' 通过portalId从后台中取到对应的绑定所需提交的key '''
+                
+                username = request.POST.get('username','')
+                pwd = request.POST.get('pwd','')
+        #        print '%s    %s'%(username,pwd)
+                for i in range(0,5):
+                
+                    time.sleep(1)
     
     
+#    return HttpResponse('''{"result_code":208,"msg":"bind succeed"}''', content_type="application/json")
     
+    return HttpResponse('''{"result_code":408,"msg":"bind failed"}''', content_type="application/json")
     

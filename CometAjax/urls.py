@@ -35,6 +35,7 @@ urlpatterns = patterns('',
     (r'^regist/renderQRCode/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.renderQRCode'),
     (r'^regist/clientRegist$', 'AuthCenter.views.clientRegist'),
     (r'^regist/bindAccount/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.bindAccount'),
+    (r'^regist/bindAccountFormAjaxPost/$', 'AuthCenter.views.bindAccountFormAjaxPost'),
     
     
     (r'^(?P<path>.*)$', 'django.views.static.serve'

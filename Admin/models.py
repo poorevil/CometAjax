@@ -1,15 +1,16 @@
+#-*- coding:UTF-8 -*-
 from django.db import models
 from json import JSONEncoder
 
 class Portal(models.Model,JSONEncoder):
     '''
-    portal¶ÔÏó
+    portalå¯¹è±¡
     '''
-    name            = models.CharField(max_length=100)      #portalÃû³Æ
-    iconUrl         = models.CharField(max_length=500)      #Í¼±êµØÖ·
-    homepageUrl     = models.CharField(max_length=500)      #Ö÷Ò³µØÖ·
+    name            = models.CharField(max_length=100)      #portalåç§°
+    iconUrl         = models.CharField(max_length=500)      #å›¾æ ‡åœ°å€
+    homepageUrl     = models.CharField(max_length=500)      #ä¸»é¡µåœ°å€
     
-    order           = models.IntegerField()                 #ÅÅĞòºÅ
+    order           = models.IntegerField()                 #æ’åºå·
     
     def __unicode__(self):
         return self.id;

@@ -32,12 +32,21 @@
 	        margin: 20px 10px;
 	      }
 
+	      .center_body{
+	      	padding: 50px 10px 10px 10px; 
+	      	/*margin: 10px 100px 10px 100px; */
+	      	/*text-align: center;*/
+	      	height: 200px;
+	      }
+
 	      .footer {
-	      		margin-top: 29px;
-			  padding-top: 19px;
-			  color: #777;
-			  border-top: 1px solid #e5e5e5;
-			}
+	      	margin-top: 29px;
+			padding-top: 19px;
+			color: #777;
+			border-top: 1px solid #e5e5e5;
+		  }
+
+		 
 	</style>
   </head>
   <body>
@@ -66,13 +75,76 @@
     	<div class="title_header">
 	        <h1>微令牌 <small>完善账号信息</small></h1>
         </div>
-		
-		 <p class="lead">请使用<a href="#">微令牌客户端</a>扫描下方二维码进行登录。</p>
+        <div class="center_body">
+			<form action="" name="registForm" id="registForm" method="post" class="form-horizontal" role="form">
+			  <div class="form-group">
+			    <label for="username" class="col-sm-2 col-sm-offset-2 col-md-1 col-md-offset-3 control-label">用户名</label>
+			    <div class="col-md-4 col-sm-4">
+			    	<input type="text" class="form-control" id="username" name="username" placeholder="用户名"/>
+			    </div>
+			  </div>
 
-		 <div class="footer">
-	        <p>&copy; Company 2013</p>
-	      </div>
+			  <div class="form-group">
+			    <label for="pwd" class="col-sm-2 col-sm-offset-2 col-md-1 col-md-offset-3 control-label">密码</label>
+			    <div class="col-md-4 col-sm-4">
+			    	<input type="password" class="form-control" id="pwd" name="pwd" placeholder="密码"/>
+			    </div>
+			  </div>
+			  <div class="col-md-offset-2">
+				  <button type="button" id="submitBtn" class="btn btn-primary">绑定账号</button>
+				  <button type="reset" class="btn btn-link">重置</button>
+			  </div>
+			</form>
+		</div>
+
+		<div class="footer">
+	       <p>&copy; Company 2013</p>
+	    </div>
     </div><!-- /.container -->
+
+   <!-- Modal -->
+	<div class="modal fade" id="waitingModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
+	        <h4 class="modal-title" id="myModalLabel">账号绑定中，请稍后...</h4>
+	      </div>
+	      <div class="modal-body">
+			<div class="progress progress-striped active">
+			  <div class="progress-bar"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+			    <span class="sr-only">45% Complete</span>
+			  </div>
+			</div>
+	      </div>
+	      <!-- <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div> -->
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	<!-- Modal -->
+	<div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="resultModalLabel">账号绑定中，请稍后...</h4>
+	      </div>
+	      <div class="modal-body">
+			<div class="progress">
+			  <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+			    <span class="sr-only">100% Complete</span>
+			  </div>
+			</div>
+	      </div>
+	      <!-- <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div> -->
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -80,6 +152,48 @@
     <script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
 	<script src="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
+	var _nAjaxTimeout = 5 * 10000;
+
+	$(document).ready(function(){
+		//绑定按钮点击事件
+		$("#submitBtn").click(function(){
+			var jqxhr = $.post("/regist/bindAccountFormAjaxPost/", 
+					$("#registForm").serialize(),
+					function(data,textStatus, jqXHR) {
+						//服务器返回请求结果
+						switch(data["result_code"]){
+							case 208://get result！！
+								//隐藏进度条，显示绑定成功提示
+								// alert("result_code: "+eval(data["result_code"])+"     msg: "+data["msg"]);
+								$("#waitingModal").modal("hide");
+								$("h4#resultModalLabel").text("绑定成功");
+								$("#resultModal").modal("show");
+								break;
+							case 408://bind failed
+							default:
+								//TODO:隐藏进度条，显示绑定失败提示，请重试
+								$("#waitingModal").modal("hide");
+								$("h4#resultModalLabel").text("绑定失败提示，请重试");
+								$("#resultModal").modal("show");
+								break;
+						}
+					});
+			//请求失败
+			jqxhr.error(function() { 
+				alert("error"); 
+				//隐藏进度条，显示绑定失败提示，请重试
+				$("#waitingModal").modal("hide");
+				$("h4#resultModalLabel").text("绑定失败提示，请重试");
+				$("#resultModal").modal("show");
+			});
+
+			//显示等待进度条
+			$("#waitingModal").modal("show");
+		});
+	});
+
+
+
 	// var uuid = "{{uuid}}";
 	// var requestCount = 0;
 
