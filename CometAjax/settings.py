@@ -142,6 +142,7 @@ INSTALLED_APPS = (
     'testComet',
     'interface',
     'AuthCenter',
+    'Admin',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
