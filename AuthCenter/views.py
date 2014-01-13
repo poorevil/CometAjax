@@ -51,7 +51,7 @@ def clientRegist(request):
         
         if len(uuid)>0 and len(deviceId)>0 and len(portalId)>0 :
             ''' 
-            TODO:1.校验uuid是否存在
+            TODO:1.校验uuid是否合法
             TODO:2.校验deviceId,portalId合法性
             3.将deviceId，portalId保存至memcache中，用于页面跳转至相应portal的账号绑定页面
             '''
