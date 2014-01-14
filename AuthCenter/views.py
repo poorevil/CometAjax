@@ -3,8 +3,10 @@ from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
 from django.core.cache import cache
 
+from Admin.models import *
+
 from base64 import b64encode
-import time,hashlib,qrcode,cStringIO
+import time,hashlib,qrcode,cStringIO,requests,json
 
 def scanQRCode(request):
     
@@ -74,17 +76,21 @@ def bindAccount(request,uuid):
         registDict = cache.get(uuid,None)
         if registDict is not None:
             portalId = registDict['portalId']
-            print portalId
+#             print portalId
             '''
             通过portalId从后台中取到对应的绑定所需提交的key-value
             组装form表单内容，写入页面
             '''
+            portalObj = Portal.objects.get(id=portalId)
     
-    
-    
-    
-    return render_to_response('AuthCenter/templates/regist_bind_account.html', {'uuid': uuid}) 
-    
+            registKVList = list(PortalRegistKVDetail.objects.filter(portal=portalObj).order_by('order'))
+            
+#             for kvDetail in registKVList :
+#                 print 'key:%s  valuetype:%s'%(kvDetail.key,kvDetail.valueType)
+            dict = {'uuid': uuid,'registKVList':registKVList}
+            return render_to_response('AuthCenter/templates/regist_bind_account.html', dict) 
+        
+    return render_to_response('AuthCenter/templates/regist_error.html') 
     
 def bindAccountFormAjaxPost(request):
     '''
@@ -100,18 +106,50 @@ def bindAccountFormAjaxPost(request):
     if request.method == 'POST' :
         uuid = request.POST.get('uuid','')
         if len(uuid) > 0 :
+#             根据uuid从memcached中取到portalId
             registDict = cache.get(uuid,None)
             if registDict is not None:
                 portalId = registDict['portalId']
-                print portalId
+#                 print portalId
                 ''' 通过portalId从后台中取到对应的绑定所需提交的key '''
+                portalObj = Portal.objects.get(id=portalId)
+                registKVList = list(PortalRegistKVDetail.objects.filter(portal=portalObj).order_by('order'))
                 
-                username = request.POST.get('username','')
-                pwd = request.POST.get('pwd','')
-        #        print '%s    %s'%(username,pwd)
-                for i in range(0,5):
+                if len(registKVList) > 0:
+                    registParamDict = {}        #提交后台验证中心的键值对字典
+                    for kvDetail in registKVList :
+                        '''
+                            TODO:
+                                1.此处比较后期改为码表，比较id，可以用switch来判断
+                                2.后期需要支持单选框、多选框、下拉框等
+                        '''
+                        if cmp('text',kvDetail.valueType) == 0 or cmp('password',kvDetail.valueType) == 0:
+                            registParamDict[kvDetail.key] = request.POST.get(kvDetail.key,'')
+                            print 'key:%s  valuetype:%s'%(kvDetail.key,kvDetail.valueType)
                 
-                    time.sleep(1)
+                    ''' 提交后台接口进行账号绑定 '''
+                    interfaceUrl = portalObj.registInterfaceUrl         #绑定接口url地址
+                    response = None
+                    if cmp('post',portalObj.registInterfaceFormAction.lower()) == 0:
+                        response = requests.post(interfaceUrl, data=registParamDict, timeout = 50, allow_redirects = False)
+                    else :
+                        response = requests.get(interfaceUrl, params=registParamDict, timeout = 50, allow_redirects = False)
+                    
+                    content = response.text
+                    
+                    if content is not None and len(content) > 0:
+                        resultDict = json.loads(content)                #返回结果
+                        resultCode = resultDict['resultCode']           #响应码
+                        if cmp(resultCode.lower(),'success') == 0:
+                            accessToken = resultDict['accessToken']     #绑定账号对应的token
+                            
+                            ''' 保存token '''
+                
+                
+                
+#                 for i in range(0,5):
+#                 
+#                     time.sleep(1)
     
     
 #    return HttpResponse('''{"result_code":208,"msg":"bind succeed"}''', content_type="application/json")

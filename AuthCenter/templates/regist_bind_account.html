@@ -77,23 +77,33 @@
         </div>
         <div class="center_body">
 			<form action="" name="registForm" id="registForm" method="post" class="form-horizontal" role="form">
-			  <div class="form-group">
-			    <label for="username" class="col-sm-2 col-sm-offset-2 col-md-1 col-md-offset-3 control-label">用户名</label>
-			    <div class="col-md-4 col-sm-4">
-			    	<input type="text" class="form-control" id="username" name="username" placeholder="用户名"/>
-			    </div>
-			  </div>
+				<input type="hidden" name="uuid" value="{{uuid}}"/> 
 
-			  <div class="form-group">
-			    <label for="pwd" class="col-sm-2 col-sm-offset-2 col-md-1 col-md-offset-3 control-label">密码</label>
-			    <div class="col-md-4 col-sm-4">
-			    	<input type="password" class="form-control" id="pwd" name="pwd" placeholder="密码"/>
-			    </div>
-			  </div>
-			  <div class="col-md-offset-2">
-				  <button type="button" id="submitBtn" class="btn btn-primary">绑定账号</button>
-				  <button type="reset" class="btn btn-link">重置</button>
-			  </div>
+				{% for kv in registKVList %}
+				<div class="form-group">
+					<label for="{{kv.key}}" class="col-sm-2 col-sm-offset-2 col-md-1 col-md-offset-3 control-label">{{kv.keyHumanReadableName}}</label>
+					<div class="col-md-4 col-sm-4">
+						<input type="{{kv.valueType}}" class="form-control" id="{{kv.key}}" name="{{kv.key}}" placeholder="{{kv.keyHumanReadableName}}"/>
+					</div>
+				</div>
+				{% endfor %}
+				<!-- <div class="form-group">
+					<label for="username" class="col-sm-2 col-sm-offset-2 col-md-1 col-md-offset-3 control-label">用户名</label>
+					<div class="col-md-4 col-sm-4">
+						<input type="text" class="form-control" id="username" name="username" placeholder="用户名"/>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="pwd" class="col-sm-2 col-sm-offset-2 col-md-1 col-md-offset-3 control-label">密码</label>
+					<div class="col-md-4 col-sm-4">
+						<input type="password" class="form-control" id="pwd" name="pwd" placeholder="密码"/>
+					</div>
+				</div> -->
+				<div class="col-md-offset-2">
+					<button type="button" id="submitBtn" class="btn btn-primary">绑定账号</button>
+					<button type="reset" class="btn btn-link">重置</button>
+				</div>
 			</form>
 		</div>
 
