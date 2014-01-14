@@ -28,11 +28,25 @@ def renderQRCode(request,uuid):
     
     return HttpResponse(datauri)
 
+def clientTestRegistResult(request,uuid):
+    '''  用于客户端检查客户端扫描结果  '''
+    for i in range(0,10):
+        registDict = cache.get(uuid,None)
+        if registDict is not None:
+            registedStatus = registDict['registed']
+            if registedStatus!=None and registedStatus == True:
+                ''' 绑定成功 '''
+                return HttpResponse('''{"result_code":208,"msg":"regist succeed！！！"}''', content_type="application/json")
+            
+        time.sleep(1)
+
+    return HttpResponse('''{"result_code":408,"msg":"regist failed"}''', content_type="application/json")
+
 def registResult(request,uuid):
     '''  用于网页检查客户端扫描结果  '''
     for i in range(0,10):
-        loginResult = cache.get(uuid,'null')
-        if cmp(loginResult,'null') != 0:
+        loginResult = cache.get(uuid,None)
+        if loginResult is not None:
             ''' 
             扫描成功
             web页面跳转至对应的portal绑定页
@@ -58,7 +72,7 @@ def clientRegist(request):
             3.将deviceId，portalId保存至memcache中，用于页面跳转至相应portal的账号绑定页面
             '''
         
-            registDict = {'uuid':uuid,'deviceId':deviceId,'portalId':portalId}
+            registDict = {'uuid':uuid,'deviceId':deviceId,'portalId':portalId,'registed':False}
             cache.set(uuid,registDict,60*5)
             
             return HttpResponse('''{"regist_result":200,"msg":"go to login page"}''', content_type="application/json")
@@ -108,51 +122,65 @@ def bindAccountFormAjaxPost(request):
         if len(uuid) > 0 :
 #             根据uuid从memcached中取到portalId
             registDict = cache.get(uuid,None)
-            if registDict is not None:
+            if registDict is not None :
+                registStatus = registDict['registed']
+                
+                if registStatus == True:
+                    return HttpResponse('''{"result_code":308,"msg":"this account already binded"}''', content_type="application/json")
+                
                 portalId = registDict['portalId']
 #                 print portalId
                 ''' 通过portalId从后台中取到对应的绑定所需提交的key '''
                 portalObj = Portal.objects.get(id=portalId)
-                registKVList = list(PortalRegistKVDetail.objects.filter(portal=portalObj).order_by('order'))
                 
-                if len(registKVList) > 0:
-                    registParamDict = {}        #提交后台验证中心的键值对字典
-                    for kvDetail in registKVList :
-                        '''
-                            TODO:
-                                1.此处比较后期改为码表，比较id，可以用switch来判断
-                                2.后期需要支持单选框、多选框、下拉框等
-                        '''
-                        if cmp('text',kvDetail.valueType) == 0 or cmp('password',kvDetail.valueType) == 0:
-                            registParamDict[kvDetail.key] = request.POST.get(kvDetail.key,'')
-                            print 'key:%s  valuetype:%s'%(kvDetail.key,kvDetail.valueType)
-                
-                    ''' 提交后台接口进行账号绑定 '''
-                    interfaceUrl = portalObj.registInterfaceUrl         #绑定接口url地址
-                    response = None
-                    if cmp('post',portalObj.registInterfaceFormAction.lower()) == 0:
-                        response = requests.post(interfaceUrl, data=registParamDict, timeout = 50, allow_redirects = False)
-                    else :
-                        response = requests.get(interfaceUrl, params=registParamDict, timeout = 50, allow_redirects = False)
+                if portalObj is not None :
+                    registKVList = list(PortalRegistKVDetail.objects.filter(portal=portalObj).order_by('order'))
                     
-                    content = response.text
+                    if len(registKVList) > 0:
+                        registParamDict = {}        #提交后台验证中心的键值对字典
+                        for kvDetail in registKVList :
+                            '''
+                                TODO:
+                                    1.此处比较后期改为码表，比较id，可以用switch来判断
+                                    2.后期需要支持单选框、多选框、下拉框等
+                            '''
+                            if cmp('text',kvDetail.valueType) == 0 or cmp('password',kvDetail.valueType) == 0:
+                                registParamDict[kvDetail.key] = request.POST.get(kvDetail.key,'')
+                                print 'key:%s  valuetype:%s'%(kvDetail.key,kvDetail.valueType)
                     
-                    if content is not None and len(content) > 0:
-                        resultDict = json.loads(content)                #返回结果
-                        resultCode = resultDict['resultCode']           #响应码
-                        if cmp(resultCode.lower(),'success') == 0:
-                            accessToken = resultDict['accessToken']     #绑定账号对应的token
-                            
-                            ''' 保存token '''
-                
-                
-                
-#                 for i in range(0,5):
-#                 
-#                     time.sleep(1)
-    
-    
-#    return HttpResponse('''{"result_code":208,"msg":"bind succeed"}''', content_type="application/json")
-    
+                        ''' 
+                            提交后台接口进行账号绑定
+                            接口要求，返回json格式数据，格式必须包含如下内容：
+                            {"resultCode":"success","accessToken":"asdfsdfdsfsdf"}
+                        '''
+                        interfaceUrl = portalObj.registInterfaceUrl         #绑定接口url地址
+                        response = None
+                        if cmp('post',portalObj.registInterfaceFormAction.lower()) == 0:
+                            response = requests.post(interfaceUrl, data=registParamDict, timeout = 50, allow_redirects = False)
+                        else :
+                            response = requests.get(interfaceUrl, params=registParamDict, timeout = 50, allow_redirects = False)
+                        
+                        content = response.text
+                        
+                        if content is not None and len(content) > 0:
+                            resultDict = json.loads(content)                #返回结果
+                            resultCode = resultDict['resultCode']           #响应码
+                            if cmp(resultCode.lower(),'success') == 0:
+                                accessToken = resultDict['accessToken']     #绑定账号对应的token
+                                print 'accessToken  %s'%accessToken
+                                ''' 保存token '''
+                                userInfo = UserInfo()
+                                userInfo.token = accessToken
+                                userInfo.portal = portalObj
+                                userInfo.deviceId = registDict['deviceId']
+                                #用户其他信息...
+                                userInfo.save()
+                                
+                                ''' 修改memcached中uuid对应的注册状态为True '''
+                                registDict['registed'] = True
+                                cache.set(uuid,registDict,60*5)
+                                
+                                return HttpResponse('''{"result_code":208,"msg":"bind succeed"}''', content_type="application/json")
+        
     return HttpResponse('''{"result_code":408,"msg":"bind failed"}''', content_type="application/json")
     

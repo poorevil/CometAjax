@@ -69,5 +69,10 @@ def clientLogin(request):
     return HttpResponse('''{"login_result":400,"msg":"login failed"}''')
     
 
+
+#############################
+def registInterfaceTest(request):
+    
+    return HttpResponse('''{"resultCode":"success","accessToken":"asdfsdfdsfsdf"}''')
     
     

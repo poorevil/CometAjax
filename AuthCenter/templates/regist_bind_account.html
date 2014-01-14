@@ -179,11 +179,18 @@
 								$("h4#resultModalLabel").text("绑定成功");
 								$("#resultModal").modal("show");
 								break;
+							case 308://get result！！
+								//隐藏进度条，显示绑定成功提示
+								// alert("result_code: "+eval(data["result_code"])+"     msg: "+data["msg"]);
+								$("#waitingModal").modal("hide");
+								$("h4#resultModalLabel").text("该帐号已绑定成功！");
+								$("#resultModal").modal("show");
+								break;
 							case 408://bind failed
 							default:
 								//TODO:隐藏进度条，显示绑定失败提示，请重试
 								$("#waitingModal").modal("hide");
-								$("h4#resultModalLabel").text("绑定失败提示，请重试");
+								$("h4#resultModalLabel").text("绑定失败，请重试");
 								$("#resultModal").modal("show");
 								break;
 						}
@@ -193,7 +200,7 @@
 				alert("error"); 
 				//隐藏进度条，显示绑定失败提示，请重试
 				$("#waitingModal").modal("hide");
-				$("h4#resultModalLabel").text("绑定失败提示，请重试");
+				$("h4#resultModalLabel").text("绑定失败，请重试");
 				$("#resultModal").modal("show");
 			});
 

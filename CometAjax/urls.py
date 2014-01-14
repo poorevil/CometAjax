@@ -32,10 +32,16 @@ urlpatterns = patterns('',
 #    注册部分
     (r'^regist/scanqrcode/$', 'AuthCenter.views.scanQRCode'),
     (r'^regist/registResult/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.registResult'),
+    (r'^regist/clientTestRegistResult/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.clientTestRegistResult'),
     (r'^regist/renderQRCode/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.renderQRCode'),
     (r'^regist/clientRegist$', 'AuthCenter.views.clientRegist'),
     (r'^regist/bindAccount/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.bindAccount'),
     (r'^regist/bindAccountFormAjaxPost/$', 'AuthCenter.views.bindAccountFormAjaxPost'),
+    
+    
+#################用于测试
+    (r'^registInterfaceTest/$', 'testComet.views.registInterfaceTest'),
+    
     
     
     (r'^(?P<path>.*)$', 'django.views.static.serve'

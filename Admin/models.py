@@ -37,7 +37,7 @@ class UserInfo(models.Model,JSONEncoder):
     
     #用户其他信息
     name            = models.CharField(max_length=100)      #姓名
-    #。。。等等
+    #datetime。。。等等
     
     def __unicode__(self):
         return self.id;
