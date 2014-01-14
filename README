@@ -1,3 +1,5 @@
 1.PIL
 2.qrcode
 3.python-memcached
+4.requests
+5.MySQLdb
