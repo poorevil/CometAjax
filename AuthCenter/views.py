@@ -40,7 +40,7 @@ def clientTestRegistResult(request,uuid):
             
         time.sleep(1)
 
-    return HttpResponse('''{"result_code":408,"msg":"regist failed"}''', content_type="application/json")
+    return HttpResponse('''{"result_code":408,"msg":"registing wait"}''', content_type="application/json")
 
 def registResult(request,uuid):
     '''  用于网页检查客户端扫描结果  '''
