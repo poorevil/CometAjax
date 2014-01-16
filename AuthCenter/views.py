@@ -36,7 +36,8 @@ def clientTestRegistResult(request,uuid):
             registedStatus = registDict['registed']
             if registedStatus!=None and registedStatus == True:
                 ''' 绑定成功 '''
-                return HttpResponse('''{"result_code":208,"msg":"regist succeed！！！"}''', content_type="application/json")
+                return HttpResponse('''{"result_code":208,"msg":"regist succeed","accessToken":"%s"}'''%registDict['accessToken'], 
+                                    content_type="application/json")
             
         time.sleep(1)
 
@@ -72,7 +73,7 @@ def clientRegist(request):
             3.将deviceId，portalId保存至memcache中，用于页面跳转至相应portal的账号绑定页面
             '''
         
-            registDict = {'uuid':uuid,'deviceId':deviceId,'portalId':portalId,'registed':False}
+            registDict = {'uuid':uuid,'deviceId':deviceId,'portalId':portalId,'registed':False,'accessToken':''}
             cache.set(uuid,registDict,60*5)
             
             return HttpResponse('''{"regist_result":200,"msg":"go to login page"}''', content_type="application/json")
@@ -178,6 +179,7 @@ def bindAccountFormAjaxPost(request):
                                 
                                 ''' 修改memcached中uuid对应的注册状态为True '''
                                 registDict['registed'] = True
+                                registDict['accessToken'] = accessToken
                                 cache.set(uuid,registDict,60*5)
                                 
                                 return HttpResponse('''{"result_code":208,"msg":"bind succeed"}''', content_type="application/json")
