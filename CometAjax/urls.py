@@ -27,7 +27,9 @@ urlpatterns = patterns('',
     (r'^clientLogin$', 'testComet.views.clientLogin'),
     
 #    接口部分 
-    (r'^sliderList$', 'interface.views.sliderList'),
+    (r'^interface/sliderList$', 'interface.views.sliderList'),
+    (r'^interface/portalList$', 'interface.views.portalList'),
+    
     
 #    注册部分
     (r'^regist/scanqrcode/$', 'AuthCenter.views.scanQRCode'),

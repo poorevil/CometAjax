@@ -2,6 +2,7 @@
 from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
 from django.core.cache import cache
+# from django.core.exceptions import ObjectDoesNotExist
 
 from Admin.models import *
 
@@ -67,16 +68,50 @@ def clientRegist(request):
         portalId = request.POST.get('portalId','')         #当前需要绑定的门户标识
         
         if len(uuid)>0 and len(deviceId)>0 and len(portalId)>0 :
-            ''' 
-            TODO:1.校验uuid是否合法
-            TODO:2.校验deviceId,portalId合法性
-            3.将deviceId，portalId保存至memcache中，用于页面跳转至相应portal的账号绑定页面
-            '''
-        
-            registDict = {'uuid':uuid,'deviceId':deviceId,'portalId':portalId,'registed':False,'accessToken':''}
-            cache.set(uuid,registDict,60*5)
+            portalObj = None
+            userInfo = None
+            try:
+                portalObj = Portal.objects.get(id=portalId)
+                userInfo = UserInfo.objects.get(portal=portalId)
+            except:
+                pass
             
-            return HttpResponse('''{"regist_result":200,"msg":"go to login page"}''', content_type="application/json")
+            if userInfo is not None and portalObj is not None:
+                ''' TODO:登录操作 '''
+                interfaceUrl = portalObj.registInterfaceUrl         #TODO:登录接口url地址
+                response = None
+                
+                registParamDict = {'deviceId':deviceId,'accessToken':userInfo.token}
+                if cmp('post',portalObj.registInterfaceFormAction.lower()) == 0:
+                    response = requests.post(interfaceUrl, data=registParamDict, timeout = 50, allow_redirects = False)
+                else :
+                    response = requests.get(interfaceUrl, params=registParamDict, timeout = 50, allow_redirects = False)
+                
+                content = response.text
+                
+                if content is not None and len(content) > 0:
+                    resultDict = json.loads(content)                #返回结果
+                    resultCode = resultDict['resultCode']           #响应码
+                    if cmp(resultCode.lower(),'success') == 0:
+                        ''' 登录成功 '''
+                        return HttpResponse('''{"regist_result":201,"msg":"login succeed"}''', content_type="application/json")
+                        
+                    else:
+                        ''' 登录失败 '''
+                        return HttpResponse('''{"regist_result":401,"msg":"login failed"}''', content_type="application/json")
+                
+            else:
+            
+                ''' 
+                TODO:1.校验uuid是否合法
+                TODO:2.校验deviceId,portalId合法性
+                3.将deviceId，portalId保存至memcache中，用于页面跳转至相应portal的账号绑定页面
+                '''
+            
+                registDict = {'uuid':uuid,'deviceId':deviceId,'portalId':portalId,'registed':False,'accessToken':''}
+                cache.set(uuid,registDict,60*5)
+                
+                return HttpResponse('''{"regist_result":200,"msg":"go to login page"}''', content_type="application/json")
         
     return HttpResponse('''{"regist_result":400,"msg":"regist failed"}''', content_type="application/json")
 
@@ -96,15 +131,19 @@ def bindAccount(request,uuid):
             通过portalId从后台中取到对应的绑定所需提交的key-value
             组装form表单内容，写入页面
             '''
-            portalObj = Portal.objects.get(id=portalId)
-    
-            registKVList = list(PortalRegistKVDetail.objects.filter(portal=portalObj).order_by('order'))
+            portalObj = None
+            try:
+                portalObj = Portal.objects.get(id=portalId)
+                
+                registKVList = list(PortalRegistKVDetail.objects.filter(portal=portalObj).order_by('order'))
             
-#             for kvDetail in registKVList :
-#                 print 'key:%s  valuetype:%s'%(kvDetail.key,kvDetail.valueType)
-            dict = {'uuid': uuid,'registKVList':registKVList}
-            return render_to_response('AuthCenter/templates/regist_bind_account.html', dict) 
-        
+    #             for kvDetail in registKVList :
+    #                 print 'key:%s  valuetype:%s'%(kvDetail.key,kvDetail.valueType)
+                dict = {'uuid': uuid,'registKVList':registKVList}
+                return render_to_response('AuthCenter/templates/regist_bind_account.html', dict) 
+            except :
+                portalObj = None
+    
     return render_to_response('AuthCenter/templates/regist_error.html') 
     
 def bindAccountFormAjaxPost(request):
@@ -132,7 +171,11 @@ def bindAccountFormAjaxPost(request):
                 portalId = registDict['portalId']
 #                 print portalId
                 ''' 通过portalId从后台中取到对应的绑定所需提交的key '''
-                portalObj = Portal.objects.get(id=portalId)
+                portalObj = None
+                try:
+                    portalObj = Portal.objects.get(id=portalId)
+                except :
+                    portalObj = None
                 
                 if portalObj is not None :
                     registKVList = list(PortalRegistKVDetail.objects.filter(portal=portalObj).order_by('order'))

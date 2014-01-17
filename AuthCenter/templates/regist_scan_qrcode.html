@@ -116,6 +116,12 @@
 						location.href = "/regist/bindAccount/"+uuid+"/";
 
 						break;
+					case 209://login succeed！！
+						// 返回后台认证服务器返回的tiket等跳转信息 data["result_code"]
+
+						location.href = "/regist/bindAccount/"+uuid+"/";
+
+						break;
 					case 408://time out
 					default:
 						setTimeout(watchDog(),500);
