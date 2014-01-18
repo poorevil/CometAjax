@@ -47,8 +47,21 @@ def clientTestRegistResult(request,uuid):
 def registResult(request,uuid):
     '''  用于网页检查客户端扫描结果  '''
     for i in range(0,10):
-        loginResult = cache.get(uuid,None)
-        if loginResult is not None:
+        registDict = cache.get(uuid,None)
+        if registDict is not None and len(registDict)>0:
+            logined = registDict['Logined']
+            if logined!=None and logined == True:
+                portalObj = None
+                try:
+                    portalObj = Portal.objects.get(id=registDict['portalId'])
+                except :
+                    portalObj = None
+                
+                ''' 登录成功 '''
+                return HttpResponse('''{"result_code":209,"msg":"Logined succeed","accessToken":"%s","destLoction":"%s"}'''
+                                    %(registDict['accessToken'],portalObj.homepageUrl), 
+                                    content_type="application/json")
+            
             ''' 
             扫描成功
             web页面跳转至对应的portal绑定页
@@ -64,24 +77,25 @@ def clientRegist(request):
     if request.method == 'POST' :
         
         uuid     = request.POST.get('uuid','')             #二维码内容
-        deviceId = request.POST.get('deviceId','')         #设备唯一标识
+        deviceIdParam = request.POST.get('deviceId','')         #设备唯一标识
         portalId = request.POST.get('portalId','')         #当前需要绑定的门户标识
         
-        if len(uuid)>0 and len(deviceId)>0 and len(portalId)>0 :
+        if len(uuid)>0 and len(deviceIdParam)>0 and len(portalId)>0 :
             portalObj = None
             userInfo = None
             try:
                 portalObj = Portal.objects.get(id=portalId)
-                userInfo = UserInfo.objects.get(portal=portalId)
+                userInfo = UserInfo.objects.get(portal=portalId,deviceId=deviceIdParam)
             except:
-                pass
+                portalObj = None
+                userInfo = None
             
             if userInfo is not None and portalObj is not None:
                 ''' TODO:登录操作 '''
                 interfaceUrl = portalObj.registInterfaceUrl         #TODO:登录接口url地址
                 response = None
                 
-                registParamDict = {'deviceId':deviceId,'accessToken':userInfo.token}
+                registParamDict = {'deviceId':deviceIdParam,'accessToken':userInfo.token}
                 if cmp('post',portalObj.registInterfaceFormAction.lower()) == 0:
                     response = requests.post(interfaceUrl, data=registParamDict, timeout = 50, allow_redirects = False)
                 else :
@@ -93,6 +107,13 @@ def clientRegist(request):
                     resultDict = json.loads(content)                #返回结果
                     resultCode = resultDict['resultCode']           #响应码
                     if cmp(resultCode.lower(),'success') == 0:
+                        registDict = {'uuid':uuid,'deviceId':deviceIdParam,
+                                      'portalId':portalId,
+                                      'registed':True,
+                                      'Logined':True,
+                                      'accessToken':''}
+                        cache.set(uuid,registDict,60*5)
+                        
                         ''' 登录成功 '''
                         return HttpResponse('''{"regist_result":201,"msg":"login succeed"}''', content_type="application/json")
                         
@@ -108,7 +129,7 @@ def clientRegist(request):
                 3.将deviceId，portalId保存至memcache中，用于页面跳转至相应portal的账号绑定页面
                 '''
             
-                registDict = {'uuid':uuid,'deviceId':deviceId,'portalId':portalId,'registed':False,'accessToken':''}
+                registDict = {'uuid':uuid,'deviceId':deviceIdParam,'portalId':portalId,'registed':False,'Logined':False,'accessToken':''}
                 cache.set(uuid,registDict,60*5)
                 
                 return HttpResponse('''{"regist_result":200,"msg":"go to login page"}''', content_type="application/json")
@@ -225,7 +246,7 @@ def bindAccountFormAjaxPost(request):
                                 registDict['accessToken'] = accessToken
                                 cache.set(uuid,registDict,60*5)
                                 
-                                return HttpResponse('''{"result_code":208,"msg":"bind succeed"}''', content_type="application/json")
+                                return HttpResponse('''{"result_code":208,"msg":"bind succeed","destLoction":"%s"}'''%portalObj.homepageUrl, content_type="application/json")
         
     return HttpResponse('''{"result_code":408,"msg":"bind failed"}''', content_type="application/json")
     

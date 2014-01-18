@@ -21,7 +21,7 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
 
-    (r'^$', 'testComet.views.index'),
+#    (r'^$', 'testComet.views.index'),
     (r'^loginresult/(?P<uuid>[\w\d]{0,50})/$', 'testComet.views.loginResult'),
     (r'^renderQRCode/(?P<uuid>[\w\d]{0,50})/$', 'testComet.views.renderQRCode'),
     (r'^clientLogin$', 'testComet.views.clientLogin'),
@@ -33,6 +33,7 @@ urlpatterns = patterns('',
     
 #    注册部分
     (r'^regist/scanqrcode/$', 'AuthCenter.views.scanQRCode'),
+    (r'^$','AuthCenter.views.scanQRCode'),
     (r'^regist/registResult/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.registResult'),
     (r'^regist/clientTestRegistResult/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.clientTestRegistResult'),
     (r'^regist/renderQRCode/(?P<uuid>[\w\d]{0,50})/$', 'AuthCenter.views.renderQRCode'),

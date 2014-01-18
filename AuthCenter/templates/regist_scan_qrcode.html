@@ -119,7 +119,8 @@
 					case 209://login succeed！！
 						// 返回后台认证服务器返回的tiket等跳转信息 data["result_code"]
 
-						location.href = "/regist/bindAccount/"+uuid+"/";
+						//跳转到指定目录
+						location.href = data["destLoction"];
 
 						break;
 					case 408://time out

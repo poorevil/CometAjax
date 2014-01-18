@@ -178,6 +178,12 @@
 								$("#waitingModal").modal("hide");
 								$("h4#resultModalLabel").text("绑定成功");
 								$("#resultModal").modal("show");
+
+								//跳转到指定目录
+								setTimeout(function(){
+									location.href = data["destLoction"];
+								},1000);
+
 								break;
 							case 308://get result！！
 								//隐藏进度条，显示绑定成功提示
